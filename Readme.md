@@ -1,0 +1,3 @@
+# airQmap
+
+Le but de ce projet est de visualiser en temps réél les mesures en concentration des polluants sur le territoire français. Les données sont issues du portail françaisde la données data.gouv.fr, et sont relevées toutes les heures par des stations de mesures réparties sur le territoire français avant d'être aggrégées par le Laboratoire Central de Surveillance de la Qualité de l'Air (LCSQA).
