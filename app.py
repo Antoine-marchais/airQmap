@@ -11,7 +11,7 @@ def get_blank():
 @app.route("/heatmap")
 def get_heat():
     folium_map = representation.heatmap()
-    return folium_map.repr_html_()
+    return folium_map._repr_html_()
 
 if __name__ == "__main__":
     app.run()
