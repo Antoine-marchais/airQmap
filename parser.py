@@ -3,6 +3,7 @@ import pickle as pkl
 import argparse
 import pandas as pd
 import logging
+from model import Pollutant
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +59,8 @@ def parse_mesures(path_to_mesures, path_to_stations):
                 mesure["date_mesure"] = value.split(",")[0]
                 mesure["value"] = value.split(",")[4]
                 mesure["station_id"] = elt.find("om:name",{"xlink:href":"http://dd.eionet.europa.eu/vocabulary/aq/processparameter/SamplingPoint"}).find_next()["xlink:href"]
+                pollutant_idx = int(elt.find("om:observedProperty")["xlink:href"].split("/")[-1])
+                mesure["pollutant"] = Pollutant(pollutant_idx).name
                 mesure["position"] = {}
                 station_id = mesure["station_id"].split("/")[-1].split("-")[-1]
                 position = get_station_coords(station_id, stations_df)
