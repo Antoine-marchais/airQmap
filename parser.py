@@ -4,6 +4,7 @@ import argparse
 import pandas as pd
 import logging
 from model import Pollutant
+import datetime as dt
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +57,8 @@ def parse_mesures(path_to_mesures, path_to_stations):
             values = elt.find("swe:values").string.split("@@")[:-1]
             for value in values : 
                 mesure = {}
-                mesure["date_mesure"] = value.split(",")[0]
+                mesure["start_mesure"] = dt.datetime.fromisoformat(value.split(",")[0]).astimezone()
+                mesure["end_mesure"] = dt.datetime.fromisoformat(value.split(",")[1]).astimezone()
                 mesure["value"] = value.split(",")[4]
                 mesure["station_id"] = elt.find("om:name",{"xlink:href":"http://dd.eionet.europa.eu/vocabulary/aq/processparameter/SamplingPoint"}).find_next()["xlink:href"]
                 pollutant_idx = int(elt.find("om:observedProperty")["xlink:href"].split("/")[-1])

@@ -1,10 +1,6 @@
 import folium
 from enum import Enum
 
-def get_map():
-    folium_map = folium.Map(location=[46,2.291705], zoom_start=7)
-    return folium_map
-
 class Pollutant(Enum):
     NO2 = 8
     SO2 = 1
