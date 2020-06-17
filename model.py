@@ -3,8 +3,9 @@ import pymongo
 from enum import Enum
 import logging
 from collections import OrderedDict
+import datetime as dt
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 class Pollutant(Enum):
     NO2 = 8
@@ -35,9 +36,11 @@ class DBClient:
         if not "mesures" in self.db.list_collection_names():
             self.mesures.create_index("mesure_ref", unique=True)
 
+        self.datasets = self.db["datasets"]
+
     def insert_mesures(self, mesures):
         """
-        Insert without dupplicates a list of mesures in the database
+        Insert without duplicates a list of mesures in the database
 
         Args:
             mesures (list(dict)): list of mesures to insert
@@ -49,7 +52,7 @@ class DBClient:
 
     def insert_stations(self, stations):
         """
-        Insert without dupplicates a list of mesurement stations in the database
+        Insert without duplicates a list of mesurement stations in the database
 
         Args:
             stations (list(dict)): list of stations with their id and coordinates
@@ -58,6 +61,18 @@ class DBClient:
             self.stations.insert_many(stations, ordered=False)
         except:
             logger.debug("failed to insert some mesures due to dupplicated references")
+
+    def insert_dataset(self, url):
+        """
+        Insert newly parsed datasets urls
+
+        Args:
+            url (string): url of the inserted dataset
+        """
+        try :
+            self.datasets.insert_one({"url":url})
+        except :
+            logger.debug("failed to insert dataset url")
 
     def get_mesures_by_time(self, pollutant):
         """
@@ -69,10 +84,18 @@ class DBClient:
         Returns:
             OrderedDict: dict with datetimes as keys and mesurement lists as values
         """
-        times = sorted(self.mesures.distinct("end_mesure", filter={"pollutant":pollutant}))
+        times = sorted(self.mesures.distinct("end_mesure", filter={
+            "pollutant":pollutant,
+            "end_mesure": {
+                "$gte": dt.datetime.now() - dt.timedelta(days=1)
+            }
+        }))
         ordered_mesures = OrderedDict()
         for time in times :
-            ordered_mesures[time] = list(self.mesures.find({"end_mesure":time,"pollutant":pollutant}))
+            ordered_mesures[time] = list(self.mesures.find({
+                "end_mesure":time,
+                "pollutant":pollutant,
+            }))
         return ordered_mesures
 
     
