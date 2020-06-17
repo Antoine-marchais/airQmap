@@ -56,7 +56,7 @@ def parse_mesures(path_to_mesures):
                 mesure["mesure_ref"] = elt["gml:id"]+"_"+str(i)
                 mesure["start_mesure"] = dt.datetime.fromisoformat(value.split(",")[0]).astimezone()
                 mesure["end_mesure"] = dt.datetime.fromisoformat(value.split(",")[1]).astimezone()
-                mesure["value"] = value.split(",")[4]
+                mesure["value"] = float(value.split(",")[4])
                 mesure["station_id"] = elt.find("om:name",{"xlink:href":"http://dd.eionet.europa.eu/vocabulary/aq/processparameter/SamplingPoint"}).find_next()["xlink:href"]
                 pollutant_idx = int(elt.find("om:observedProperty")["xlink:href"].split("/")[-1])
                 mesure["pollutant"] = Pollutant(pollutant_idx).name
