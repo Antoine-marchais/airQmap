@@ -4,10 +4,11 @@ import argparse
 import logging
 from model import Pollutant, DBClient
 import datetime as dt
+import requests
 
 logger = logging.getLogger(__name__)
 
-def parse_stations(path_to_stations):
+def parse_stations(station_xml):
     """Parse a station xml and return the id and geographical coordinates of each station
 
     Args:
@@ -16,9 +17,6 @@ def parse_stations(path_to_stations):
     Returns:
         list(dict): list of all stations with their id and coordinates
     """
-    with open(path_to_stations,"r") as f:
-        station_xml = f.read()
-
     soup = BeautifulSoup(station_xml, "xml")
     elts = soup.find_all("gml:Point")
     stations = []
@@ -31,7 +29,7 @@ def parse_stations(path_to_stations):
 
 def parse_mesures(last_mesures_xml):
     """
-    Parse a mesure xml using the previously parsed stations
+    Parse a mesure xml using the previously parsed stations, and parse stations metadata the first time
 
     Args:
          last_mesures_xml (string): xml string containing the last mesures
@@ -40,6 +38,11 @@ def parse_mesures(last_mesures_xml):
         list(dict): list of mesures with the geographical coordinates of mesure points
     """
     dbclient = DBClient("localhost")
+    if dbclient.stations.count()==0:
+        print("downloading and parsing stations metadata")
+        r = requests.get("https://www.data.gouv.fr/fr/datasets/r/5f112ee8-84fa-4ff7-901c-862a8c0c478b")
+        stations = parse_stations(r.text)
+        dbclient.insert_stations(stations)
 
     soup = BeautifulSoup(last_mesures_xml, "xml")
     elts = soup.find_all("om:OM_Observation")
@@ -92,6 +95,8 @@ if __name__ == "__main__":
         stations = parse_stations(stations_xml)
         client.insert_stations(stations)
     else :
-        mesures = parse_mesures(args.path)
+        with open(args.path,"r") as f:
+            mesures_xml = f.read()
+        mesures = parse_mesures(mesures_xml)
         client.insert_mesures(mesures)
 
