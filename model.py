@@ -22,11 +22,11 @@ class DBClient:
     Client for connecting to the mongodb database
     """
 
-    def __init__(self):
+    def __init__(self, host, port=27017):
         """
         Create the connection and collections
         """
-        self.client = pymongo.MongoClient("mongodb://localhost:27017")
+        self.client = pymongo.MongoClient(f"mongodb://{host}:{port}")
         self.db = self.client["airQmap"]
         self.stations = self.db["stations"]
         if not "stations" in self.db.list_collection_names():

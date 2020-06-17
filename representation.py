@@ -22,7 +22,7 @@ def heatmap(pollutant):
         Map: folium heatmap with time
     """
     folium_map = folium.Map(location=[46,2.291705], zoom_start=7)
-    client = DBClient()
+    client = DBClient("database")
     ordered_mesures = client.get_mesures_by_time(pollutant)
     global_max = get_global_max(ordered_mesures)
     heatmap_data = []
@@ -44,7 +44,7 @@ def value_map(pollutant):
         Map: folium map with time mesures
     """
     folium_map = folium.Map(location=[46,2.291705], zoom_start=7)
-    client = DBClient()
+    client = DBClient("database")
     ordered_mesures = client.get_mesures_by_time(pollutant)
     global_max = get_global_max(ordered_mesures)
 

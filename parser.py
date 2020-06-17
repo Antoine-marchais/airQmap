@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import pickle as pkl
 import argparse
-import pandas as pd
 import logging
 from model import Pollutant, DBClient
 import datetime as dt
@@ -40,7 +39,7 @@ def parse_mesures(last_mesures_xml):
     Returns:
         list(dict): list of mesures with the geographical coordinates of mesure points
     """
-    dbclient = DBClient()
+    dbclient = DBClient("localhost")
 
     soup = BeautifulSoup(last_mesures_xml, "xml")
     elts = soup.find_all("om:OM_Observation")
@@ -86,7 +85,7 @@ if __name__ == "__main__":
     parser.add_argument("path", help="path of the document to parse")
     parser.add_argument("--parse-stations", action="store_true", help="if set the parsed document is a stations xml, else it is a mesure xml")
     args = parser.parse_args()
-    client = DBClient()
+    client = DBClient("localhost")
     if args.parse_stations :
         with open(args.path,"r") as f:
             stations_xml = f.read()

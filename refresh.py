@@ -27,7 +27,7 @@ def insert_new_mesures(new_urls, limit=10):
         limit (int, optional): maximum number of datasets to parse. Defaults to 10.
     """
     print(f"found {len(new_urls)} new urls, only last {limit} will be parsed")
-    client = DBClient()
+    client = DBClient("localhost")
     already_inserted_urls = [dataset["url"] for dataset in client.datasets.find()]
     for url in new_urls[:limit]:
         if not (url in already_inserted_urls):
