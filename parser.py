@@ -30,19 +30,17 @@ def parse_stations(path_to_stations):
         stations.append(station)
     return stations
 
-def parse_mesures(path_to_mesures):
+def parse_mesures(last_mesures_xml):
     """
     Parse a mesure xml using the previously parsed stations
 
     Args:
-         path_to_mesures (string): path to the mesures as a xml file
+         last_mesures_xml (string): xml string containing the last mesures
 
     Returns:
         list(dict): list of mesures with the geographical coordinates of mesure points
     """
     dbclient = DBClient()
-    with open(path_to_mesures,"r") as f:
-        last_mesures_xml = f.read()
 
     soup = BeautifulSoup(last_mesures_xml, "xml")
     elts = soup.find_all("om:OM_Observation")
@@ -90,7 +88,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     client = DBClient()
     if args.parse_stations :
-        stations = parse_stations(args.path)
+        with open(args.path,"r") as f:
+            stations_xml = f.read()
+        stations = parse_stations(stations_xml)
         client.insert_stations(stations)
     else :
         mesures = parse_mesures(args.path)
